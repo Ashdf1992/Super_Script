@@ -7,6 +7,10 @@
     remote restart computers & drop system center configuration manager remote session & remote kill rphost ( 1c ) process & get LAPS password for computer from Active Directory
 #>
 
+
+#################GUI STARTS HERE########################
+
+
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
@@ -15,12 +19,12 @@ $Form.ClientSize                 = '597,334'
 $Form.text                       = "Ash's Super Script"
 $Form.TopMost                    = $false
 
-$DropSCCMSession                 = New-Object system.Windows.Forms.Button
-$DropSCCMSession.text            = "Drop SCCM Session"
-$DropSCCMSession.width           = 132
-$DropSCCMSession.height          = 48
-$DropSCCMSession.location        = New-Object System.Drawing.Point(8,14)
-$DropSCCMSession.Font            = 'Microsoft Sans Serif,10'
+$PingTest                 = New-Object system.Windows.Forms.Button
+$PingTest.text            = "Ping Test"
+$PingTest.width           = 132
+$PingTest.height          = 48
+$PingTest.location        = New-Object System.Drawing.Point(8,14)
+$PingTest.Font            = 'Microsoft Sans Serif,10'
 
 $KillRPhostButton                = New-Object system.Windows.Forms.Button
 $KillRPhostButton.text           = "Kill rphost"
@@ -155,14 +159,17 @@ $Button15.height                 = 48
 $Button15.location               = New-Object System.Drawing.Point(439,258)
 $Button15.Font                   = 'Microsoft Sans Serif,10'
 
-$Form.controls.AddRange(@($DropSCCMSession,$KillRPhostButton,$RestartComputerButton,$LapsPasswd,$Clean1cCashBotton,$Button1,$Button2,$Button3,$Button4,$Button5,$Button6,$Button7,$Button8,$Button9,$Button10,$Button11,$Button12,$Button13,$Button14,$Button15))
+$Form.controls.AddRange(@($PingTest,$KillRPhostButton,$RestartComputerButton,$LapsPasswd,$Clean1cCashBotton,$Button1,$Button2,$Button3,$Button4,$Button5,$Button6,$Button7,$Button8,$Button9,$Button10,$Button11,$Button12,$Button13,$Button14,$Button15))
 
-$DropSCCMSession.Add_Click({ DropSCCM })
+$PingTest.Add_Click({ PingTest })
 $KillRPhostButton.Add_Click({ ResetRphost })
 $RestartComputerButton.Add_Click({ restartpc })
 $LapsPasswd.Add_Click({ GetLapspass })
 $Clean1cCashBotton.Add_Click({ Clean_1cV8_cash })
 
+#################GUI ENDS HERE########################
+
+#################LOGIC STARTS HERE########################
 
 function Clean_1cV8_cash { 
     
@@ -185,9 +192,18 @@ function GetLapspass {
         $ResultTexBox.text += "`r`n" +"`r`n" + $LapsPWD }
     }
 
-function DropSCCM(){
-    Get-Service -ComputerName $computerName.text -name CmRcService | Restart-Service 
+function PingTest()
+{
+    cls
+        $HostOrIP = Read-Host "Please enter and IP or Computer Name"
+        $Port = Read-Host "Please enter the port you wish to test"
+            do {
+                    Write-Host "waiting..."
+                    sleep 3      
+                } until(Test-NetConnection $HostOrIP -Port $Port | ? { $_.TcpTestSucceeded } )
+
 }
+
     
 function ResetRphost(){
 if($AdminpswCheckBox.Checked -eq $true ){
@@ -207,3 +223,4 @@ if($AdminpswCheckBox.Checked -eq $true ){
     Restart-Computer -ComputerName $computerName.text -Force }
 }
 [void]$Form.ShowDialog()
+#################LOGIC ENDS HERE########################
