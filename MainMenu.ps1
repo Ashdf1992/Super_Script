@@ -45,11 +45,23 @@
                         $OutputCSV = Read-Host "Do you want to Save the Output to a CSV? (Y or N)"
                         if ($OutputCSV -eq "Y" -or $OutputCSV -eq "y" -or $OutputCSV -eq "Yes" -or $OutputCSV -eq "YES" -or $OutputCSV -eq "yes")
                         {
-                            "You wanted to output the CSV"
+                            if ( -not (Test-Path $env:USERPROFILE\Desktop\SuperScriptOutput) ) 
+                            { 
+                                mkdir $env:USERPROFILE\Desktop\SuperScriptOutput
+                                $Port = Read-Host "Please enter the port you wish to check"
+                                Get-NetTCPConnection | Where-Object { ($_.LocalPort -eq $Port) -and ($_.LocalAddress -ne "::") -and ($_.LocalAddress -ne "0.0.0.0") -and ($_.RemoteAddress -ne "0.0.0.0") -and ($_.RemoteAddress -ne "::") } | Select-Object LocalAddress,LocalPort,RemoteAddress,RemotePort,State | Export-CSV $env:USERPROFILE\Desktop\SuperScriptOutput\PortCheck.csv
+                            }
+                            else
+                            {
+                                $Port = Read-Host "Please enter the port you wish to check"
+                                Get-NetTCPConnection | Where-Object { ($_.LocalPort -eq $Port) -and ($_.LocalAddress -ne "::") -and ($_.LocalAddress -ne "0.0.0.0") -and ($_.RemoteAddress -ne "0.0.0.0") -and ($_.RemoteAddress -ne "::") } | Select-Object LocalAddress,LocalPort,RemoteAddress,RemotePort,State | Export-CSV $env:USERPROFILE\Desktop\SuperScriptOutput\PortCheck.csv
+                            }
+                            
                         }
                         else
                         {
-                            "You didnt want to output the CSV"
+                            $Port = Read-Host "Please enter the port you wish to check"
+                            Get-NetTCPConnection | Where-Object { ($_.LocalPort -eq $Port) -and ($_.LocalAddress -ne "::") -and ($_.LocalAddress -ne "0.0.0.0") -and ($_.RemoteAddress -ne "0.0.0.0") -and ($_.RemoteAddress -ne "::") } | Select-Object LocalAddress,LocalPort,RemoteAddress,RemotePort,State | Format-Table
                         }
                     }
                                         					
